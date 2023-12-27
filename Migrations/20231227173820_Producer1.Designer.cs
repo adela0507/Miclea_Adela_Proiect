@@ -4,6 +4,7 @@ using Miclea_Adela_Proiect.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Miclea_Adela_Proiect.Migrations
 {
     [DbContext(typeof(ProductContext))]
-    partial class ProductContextModelSnapshot : ModelSnapshot
+    [Migration("20231227173820_Producer1")]
+    partial class Producer1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,9 +60,6 @@ namespace Miclea_Adela_Proiect.Migrations
                     b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("ProductID")
                         .HasColumnType("int");
 
@@ -83,11 +82,12 @@ namespace Miclea_Adela_Proiect.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProducerName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProducerID");
 
-                    b.ToTable("Producer", (string)null);
+                    b.ToTable("Producer");
                 });
 
             modelBuilder.Entity("Miclea_Adela_Proiect.Models.Product", b =>

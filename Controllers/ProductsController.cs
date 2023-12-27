@@ -36,6 +36,10 @@ namespace Miclea_Adela_Proiect.Controllers
             }
 
             var product = await _context.Products
+                .Include(p=>p.Producer)
+                .Include(s => s.Orders)
+                .ThenInclude(e => e.Customer)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (product == null)
             {
@@ -48,6 +52,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // GET: Products/Create
         public IActionResult Create()
         {
+            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName");
             return View();
         }
 
@@ -56,7 +61,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Producer,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("ID,Name,ProducerID,Price")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -64,6 +69,8 @@ namespace Miclea_Adela_Proiect.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName", product.ProducerID);
             return View(product);
         }
 
@@ -80,6 +87,8 @@ namespace Miclea_Adela_Proiect.Controllers
             {
                 return NotFound();
             }
+            ViewData["ProducerName"] = new SelectList(_context.Producers, "ProducerName", "ProducerName", product.ProducerID);
+
             return View(product);
         }
 
@@ -119,7 +128,7 @@ namespace Miclea_Adela_Proiect.Controllers
         }
 
         // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null || _context.Products == null)
             {
@@ -142,6 +151,7 @@ namespace Miclea_Adela_Proiect.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Products == null)
+
             {
                 return Problem("Entity set 'ProductContext.Products'  is null.");
             }

@@ -8,9 +8,10 @@ namespace Miclea_Adela_Proiect.Models
     {
         public int ID { get; set; } 
         public string Name { get; set; }
-        public string Producer { get; set; }
+        public int? ProducerID { get; set; }
+        public Producer? Producer { get; set; }
         public decimal Price { get; set; }
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<Order>? Orders { get; set; }
 
     }
 }

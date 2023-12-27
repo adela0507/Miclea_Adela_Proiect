@@ -16,24 +16,47 @@ namespace Miclea_Adela_Proiect.Data
                 {
                     return; // BD a fost creata anterior
                 }
+                Producer Producer1 = new Producer
+                {
+                    ProducerName="L'Oreal" 
+                };
+                Producer Producer2 = new Producer
+                {
+                    ProducerName = "Mabellinn"
+                };
+                Producer Producer3 = new Producer
+                {
+                    ProducerName = "Giordani"
+                };
+                Producer Producer4 = new()
+                {
+                    ProducerName = "Gucci"
+                };
+                Producer Producer5 = new Producer
+                {
+                    ProducerName = "NYX"
+
+                };
+                context.Producers.AddRange(Producer1, Producer2, Producer3, Producer4, Producer5 );
+
                 context.Products.AddRange(
                 new Product
                 {
                     Name = "Fond de ten",
-                    Producer = "Dalton",
-                    Price=Decimal.Parse("22")
+                    Producer = Producer1,
+                    Price = Decimal.Parse("22")
                 },
 
                  new Product
                  {
                      Name = "Rimel",
-                     Producer = "Mabelline",
+                     Producer = Producer2,
                      Price = Decimal.Parse("22")
                  },
                  new Product
                  {
                      Name = "Iluminator",
-                     Producer = "L'Oreal",
+                     Producer=Producer3,
                      Price = Decimal.Parse("22")
                  }
                 );

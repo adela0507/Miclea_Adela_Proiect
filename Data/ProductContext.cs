@@ -12,11 +12,13 @@ namespace Miclea_Adela_Proiect.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Producer> Producers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>().ToTable("Customer"); // configureaza aspecte specifice cume mapele de tabele, chei primare
             modelBuilder.Entity<Order>().ToTable("Order");
             modelBuilder.Entity<Product>().ToTable("Product");
+            modelBuilder.Entity<Producer>().ToTable("Producer");
         }
     }
 

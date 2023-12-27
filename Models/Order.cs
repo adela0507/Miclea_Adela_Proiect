@@ -8,6 +8,8 @@ namespace Miclea_Adela_Proiect.Models
     {
         public int OrderID { get; set; }
         public int CustomerID { get; set; }
+        public DateTime OrderDate { get; set; }
+
         public int ProductID { get; set; }
 
         public Customer Customer { get; set; }
