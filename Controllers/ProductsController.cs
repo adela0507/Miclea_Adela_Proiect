@@ -30,7 +30,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Products == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -61,18 +61,29 @@ namespace Miclea_Adela_Proiect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,ProducerID,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("ID,Name,Producer,Price")] Product product)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(product);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+
+            }
+            catch (DbUpdateException /* ex*/)
+            {
+
+                ModelState.AddModelError("", "Unable to save changes. " + "Try again, and if the problem persists ");
             }
 
             ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName", product.ProducerID);
-            return View(product);
-        }
+        
+                return View(product);
+            
+         }
 
         // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
