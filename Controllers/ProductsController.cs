@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Miclea_Adela_Proiect.Data;
 using Miclea_Adela_Proiect.Models;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Miclea_Adela_Proiect.Controllers
 {
@@ -20,11 +21,46 @@ namespace Miclea_Adela_Proiect.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            return _context.Products != null ?
-                        View(await _context.Products.ToListAsync()) :
-                        Problem("Entity set 'ProductContext.Products'  is null.");
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["TitleSortParm"] = String.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+            var products = from b in _context.Products
+                        select b;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(s => s.Name.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "title_desc":
+                    products = products.OrderByDescending(b => b.Name);
+                    break;
+                case "Price":
+                    products = products.OrderBy(b => b.Price);
+                    break;
+                case "price_desc":
+                    products = products.OrderByDescending(b => b.Price);
+                    break;
+                default:
+                    products = products.OrderBy(b => b.Name);
+                    break;
+            }
+            return View(await products.AsNoTracking().ToListAsync());
+
         }
 
         // GET: Products/Details/5
@@ -108,50 +144,52 @@ namespace Miclea_Adela_Proiect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Producer,Price")] Product product)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id != product.ID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var productToUpdate = await _context.Products.FirstOrDefaultAsync(s => s.ID == id);
+            if (await TryUpdateModelAsync<Product>(productToUpdate, "", s => s.ProducerID, s => s.Name, s => s.Price))
             {
                 try
                 {
-                    _context.Update(product);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!ProductExists(product.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(product);
+
+            return View(productToUpdate);
         }
 
-        // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
+            // GET: Products/Delete/5
+            public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
-            if (id == null || _context.Products == null)
+            if (id == null )
             {
                 return NotFound();
             }
 
             var product = await _context.Products
+                 .Include(b => b.Producer)
+                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (product == null)
             {
                 return NotFound();
             }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] = "Delete failed. Try again";
+            }
+
 
             return View(product);
         }
@@ -161,21 +199,24 @@ namespace Miclea_Adela_Proiect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Products == null)
-
-            {
-                return Problem("Entity set 'ProductContext.Products'  is null.");
-            }
             var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            if (product == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateException /* ex */)
+            {
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
-
         private bool ProductExists(int id)
         {
             return (_context.Products?.Any(e => e.ID == id)).GetValueOrDefault();

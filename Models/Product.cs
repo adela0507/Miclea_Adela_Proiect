@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 namespace Miclea_Adela_Proiect.Models
 {
@@ -12,6 +13,8 @@ namespace Miclea_Adela_Proiect.Models
         public Producer? Producer { get; set; }
         public decimal Price { get; set; }
         public ICollection<Order>? Orders { get; set; }
+        public ICollection<BrandProducer> BrandProducers { get; set; }
+
 
     }
 }
