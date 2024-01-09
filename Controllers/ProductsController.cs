@@ -30,12 +30,13 @@ namespace Miclea_Adela_Proiect.Controllers
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            if (id == null || _context.Products == null)
             {
                 return NotFound();
             }
 
             var product = await _context.Products
+                                .Include(p => p.Producer)
                 .Include(p=>p.Producer)
                 .Include(s => s.Orders)
                 .ThenInclude(e => e.Customer)
@@ -52,7 +53,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // GET: Products/Create
         public IActionResult Create()
         {
-            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName");
+            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerID");
             return View();
         }
 
@@ -61,7 +62,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Producer,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,Producer,Price")] Product product)
         {
             try
             {
@@ -79,7 +80,7 @@ namespace Miclea_Adela_Proiect.Controllers
                 ModelState.AddModelError("", "Unable to save changes. " + "Try again, and if the problem persists ");
             }
 
-            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName", product.ProducerID);
+           // ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName", product.ProducerID);
         
                 return View(product);
             
@@ -98,7 +99,7 @@ namespace Miclea_Adela_Proiect.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProducerName"] = new SelectList(_context.Producers, "ProducerName", "ProducerName", product.ProducerID);
+            ViewData["ProducerName"] = new SelectList(_context.Producers, "ProducerID", "ProducerID", product.ProducerID);
 
             return View(product);
         }
@@ -108,49 +109,52 @@ namespace Miclea_Adela_Proiect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Producer,Price")] Product product)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id != product.ID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var productUpdate = await _context.Products.FirstOrDefaultAsync(s => s.ID == id);
+            if (await TryUpdateModelAsync<Product>(productUpdate, "", s => s.ProducerID, s => s.Name, s => s.Price))
             {
                 try
                 {
-                    _context.Update(product);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!ProductExists(product.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(product);
+
+            // Add a return statement for the case when TryUpdateModelAsync fails
+            return View(productUpdate);
         }
+
 
         // GET: Products/Delete/5
         public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
-            if (id == null || _context.Products == null)
+            if (id == null )
             {
                 return NotFound();
             }
 
             var product = await _context.Products
+                .Include(b=>b.Producer)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (product == null)
             {
                 return NotFound();
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] = "Delete failed. Try again";
             }
 
             return View(product);
@@ -161,20 +165,24 @@ namespace Miclea_Adela_Proiect.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Products == null)
-
-            {
-                return Problem("Entity set 'ProductContext.Products'  is null.");
-            }
             var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            if (product == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            try
             {
                 _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateException /* ex */)
+            {
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
+
 
         private bool ProductExists(int id)
         {
