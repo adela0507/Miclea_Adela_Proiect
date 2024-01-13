@@ -26,7 +26,6 @@ namespace Miclea_Adela_Proiect.Controllers
                         View(await _context.Products.ToListAsync()) :
                         Problem("Entity set 'ProductContext.Products'  is null.");
         }
-
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -36,8 +35,7 @@ namespace Miclea_Adela_Proiect.Controllers
             }
 
             var product = await _context.Products
-                                .Include(p => p.Producer)
-                .Include(p=>p.Producer)
+                .Include(p => p.Producer)
                 .Include(s => s.Orders)
                 .ThenInclude(e => e.Customer)
                 .AsNoTracking()
@@ -107,7 +105,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // POST: Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id)
         {

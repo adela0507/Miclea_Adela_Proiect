@@ -28,16 +28,8 @@ namespace Miclea_Adela_Proiect.Data
                 {
                     ProducerName = "Giordani"
                 };
-                Producer Producer4 = new()
-                {
-                    ProducerName = "Gucci"
-                };
-                Producer Producer5 = new Producer
-                {
-                    ProducerName = "NYX"
-
-                };
-                context.Producers.AddRange(Producer1, Producer2, Producer3, Producer4, Producer5 );
+               
+                context.Producers.AddRange(Producer1, Producer2, Producer3 );
 
                 context.Products.AddRange(
                 new Product
@@ -58,7 +50,13 @@ namespace Miclea_Adela_Proiect.Data
                      Name = "Iluminator",
                      Producer=Producer3,
                      Price = Decimal.Parse("22")
-                 }
+                 },
+                  new Product
+                  {
+                      Name = "Iluminator",
+                      Producer = Producer2,
+                      Price = Decimal.Parse("22")
+                  }
                 );
 
 

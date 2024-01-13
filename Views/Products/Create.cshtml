@@ -19,7 +19,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="ProducerID" class="control-label"></label>
-                <select asp-for="ProducerID" class="form-control" asp-items="@(ViewBag.ProducerName as SelectList)"></select>
+                <select asp-for="ProducerID" class="form-control" asp-items="ViewBag.ProducerName"></select>
             </div>
 
             <div class="form-group">

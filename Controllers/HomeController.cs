@@ -37,6 +37,10 @@ namespace Miclea_Adela_Proiect.Controllers
         {
             return View();
         }
+        public IActionResult Chat()
+        {
+            return View();
+        }
 
         public IActionResult Privacy()
         {
