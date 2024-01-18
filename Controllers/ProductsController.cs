@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Miclea_Adela_Proiect.Data;
 using Miclea_Adela_Proiect.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Miclea_Adela_Proiect.Controllers
+
 {
+  // [Authorize(Policy = "OnlyAdmin")]
+
     public class ProductsController : Controller
     {
         private readonly ProductContext _context;
