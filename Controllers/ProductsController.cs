@@ -55,7 +55,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // GET: Products/Create
         public IActionResult Create()
         {
-            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerID");
+            ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName");
             return View();
         }
 
@@ -64,7 +64,7 @@ namespace Miclea_Adela_Proiect.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Producer,Price")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,ProducerName,Price")] Product product)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Miclea_Adela_Proiect.Controllers
                 ModelState.AddModelError("", "Unable to save changes. " + "Try again, and if the problem persists ");
             }
 
-           // ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName", product.ProducerID);
+           ViewData["ProducerID"] = new SelectList(_context.Producers, "ProducerID", "ProducerName", product.ProducerID);
         
                 return View(product);
             
