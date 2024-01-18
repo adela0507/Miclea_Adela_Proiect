@@ -13,12 +13,20 @@ builder.Services.AddDbContext<ProductContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<IdentityContext>();
 
 builder.Services.AddSignalR();
+builder.Services.AddRazorPages();
 builder.Services.AddDbContext<IdentityContext>(options =>
 
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAuthorization(opts => {
+    opts.AddPolicy("OnlyAdmin", policy => {
+        policy.RequireClaim("Department", "Admin");
+    });
+});
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
