@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Miclea_Adela_Proiect.Controllers
 
 {
-  // [Authorize(Policy = "OnlyAdmin")]
+  [Authorize(Policy = "OnlySales")]
 
     public class ProductsController : Controller
     {

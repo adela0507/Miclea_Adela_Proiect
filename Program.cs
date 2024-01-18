@@ -23,8 +23,8 @@ builder.Services.AddDbContext<IdentityContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthorization(opts => {
-    opts.AddPolicy("OnlyAdmin", policy => {
-        policy.RequireClaim("Department", "Admin");
+    opts.AddPolicy("OnlySales", policy => {
+        policy.RequireClaim("Departement", "Sales");
     });
 });
 
